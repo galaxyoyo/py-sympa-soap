@@ -35,7 +35,7 @@ class Client:
 
     def check_cookie(self) -> str:
         """
-        From the current cookie, retrieve the email address.
+        From the current stored cookie, retrieve the email address.
         """
         result = self.zeep.service.checkCookie()
         element = result._raw_elements[0]
