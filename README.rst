@@ -1,37 +1,40 @@
+=========================
 Python Sympa SOAP Wrapper
 =========================
 
-Small wrapper that uses [ZEEP](https://pypi.org/project/zeep/) to communicate with a SOAP endpoint linked to a Sympa
+Small wrapper that uses `ZEEP <https://pypi.org/project/zeep/>`_ to communicate with a SOAP endpoint linked to a Sympa
 server, to let automation in lists creation.
 
 Example
--------
+=======
 
 Start by creating a new client, and log in.
 Then, you can use some pre-constructed methods.
 
-```python
-from sympasoap import Client
+.. code-block:: python
 
-client = Client("https://lists.example.com/sympa")
-client.login("admin@example.com", "MY_STRONG_PASSWORD")     # Get from env
+    from sympasoap import Client
 
-# Create a list of type hotline that is named automatically-created@lists.example.com with basic description
-client.create_list(list_name="automatically-created", subject="Automatically created list", template="hotline",
-        description="This mailing list was created from a Python shell.", topic="computers/software")
+    client = Client("https://lists.example.com/sympa")
+    client.login("admin@example.com", "MY_STRONG_PASSWORD")     # Get from env
 
-# Subscribe the email address toto@example.com with name "Toto TOTO" to the list automatically-created@lists.example.com
-# in non-quiet mode: the user will receive a notification that they got subscribed
-client.subscribe(email="toto@example.com", list_address="automatically-created", quiet=False, name="Toto TOTO")
+    # Create a list of type hotline that is named automatically-created@lists.example.com with basic description
+    client.create_list(list_name="automatically-created", subject="Automatically created list", template="hotline",
+            description="This mailing list was created from a Python shell.", topic="computers/software")
 
-# Unsubscribe the email in quiet mode
-client.subscribe(email="toto@example.com", list_address="automatically-created", quiet=True)
-```
+    # Subscribe the email address toto@example.com with name "Toto TOTO" to the list automatically-created@lists.example.com
+    # in non-quiet mode: the user will receive a notification that they got subscribed
+    client.subscribe(email="toto@example.com", list_address="automatically-created", quiet=False, name="Toto TOTO")
+
+    # Unsubscribe the email in quiet mode
+    client.subscribe(email="toto@example.com", list_address="automatically-created", quiet=True)
+
 
 Available functions
--------------------
+===================
 
-```python
+.. code-block:: python
+
     def login(self, email: str, password: str) -> None:
         """
         Login into the API. Set a cookie for future connexions.
@@ -91,4 +94,4 @@ Available functions
         Subscribe the user with the given email to the given mailing list.
         If the quiet mode is enabled, the user won't receive a notification that they got subscribed.
         """
-```
+
