@@ -67,6 +67,7 @@ class Client:
     def __init__(self, sympa_url: str):
         self.sympa_url = sympa_url
         self.zeep = ZeepClient(sympa_url + "/wsdl", settings=ZeepSettings(strict=False))
+        self.cookie = None
 
     def login(self, email: str, password: str) -> None:
         """
@@ -79,7 +80,16 @@ class Client:
         if self.check_cookie() != email:
             # FIXME Better exception
             raise Exception("Unknown error: given cookie is invalid")
+        self.email = email
         print("Successfully authenticated!")
+
+    def logout(self):
+        """
+        Clear cookie
+        """
+        self.cookie = None
+        self.email = None
+        self.zeep.settings.extra_http_headers = []
 
     def check_cookie(self) -> str:
         """
