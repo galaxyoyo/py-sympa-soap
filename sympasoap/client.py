@@ -1,5 +1,7 @@
 from zeep.client import Client as ZeepClient, Settings as ZeepSettings
 
+from sympasoap.subscribers import MLUser
+
 
 class Client:
     def __init__(self, sympa_url: str):
@@ -37,3 +39,34 @@ class Client:
         result = self.zeep.service.amI(mailing_list, function, email)
         element = result._raw_elements[0]
         return element.text == "true"
+
+    def review(self, mailing_list: str, full: bool = False) -> list:
+        """
+        Get the list of all subscribers of a list, including the administrators and the editors.
+        If full=False, retrieve the list of email addresses only.
+        If full=True, retrieve MLUser object, with the name of the user and the role.
+        """
+        if full:
+            users = list()
+            elements = self.zeep.service.fullReview(mailing_list)
+            for element in elements:
+                children = element.getchildren()
+                kwargs = dict(mailing_list=mailing_list)
+                for child in children:
+                    tag = child.tag
+                    if "gecos" in tag:
+                        kwargs["name"] = child.text
+                    elif "email" in tag:
+                        kwargs["email"] = child.text
+                    elif "isSubscriber" in tag:
+                        kwargs["subscriber"] = child.text == "true"
+                    elif "isEditor" in tag:
+                        kwargs["editor"] = child.text == "true"
+                    elif "isOwner" in tag:
+                        kwargs["owner"] = child.text == "true"
+                    else:
+                        print("Unknown child tag:", tag)
+                user = MLUser(**kwargs)
+                users.append(user)
+            return users
+        return self.zeep.service.review(mailing_list)
