@@ -28,7 +28,7 @@ setup(
     include_package_data=True,
     license="MIT",
     classifiers=[
-        "Development Status :: 2 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
