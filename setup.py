@@ -20,7 +20,7 @@ setup(
     tests_require=[],
     extras_require={},
     entry_points={},
-    package_dir={"": "src"},
+    package_dir={},
     packages=["sympasoap"],
     include_package_data=True,
     license="GPLv3",
