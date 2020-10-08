@@ -165,3 +165,34 @@ class Client:
                             f"Maybe the list did not exist?", e)
             else:
                 return False
+
+    def subscribe(self, email: str, list_address: str, quiet: bool, name: str = "", raise_error: bool = False) -> bool:
+        """
+        Subscribe the user with the given email to the given mailing list.
+        If the quiet mode is enabled, the user won't receive a notification that they got subscribed.
+        """
+        try:
+            result = self.zeep.service.add(list_address, email, name, quiet)
+            return result._raw_elements[0].text == "true"
+        except Fault as e:
+            if raise_error:
+                raise Fault(f"An unknown error occured while subscribing to the list {list_address}. "
+                            f"Maybe the user is already a member?", e)
+            else:
+                return False
+
+    def unsubscribe(self, email: str, list_address: str, quiet: bool, raise_error: bool = False) -> bool:
+        """
+        Subscribe the user with the given email to the given mailing list.
+        If the quiet mode is enabled, the user won't receive a notification that they got subscribed.
+        """
+        try:
+            # del is a reserved keyword
+            result = getattr(self.zeep.service, "del")(list_address, email, quiet)
+            return result._raw_elements[0].text == "true"
+        except Fault as e:
+            if raise_error:
+                raise Fault(f"An unknown error occured while subscribing to the list {list_address}. "
+                            f"Maybe the user is already a member?", e)
+            else:
+                return False
