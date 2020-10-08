@@ -1,78 +1,8 @@
 from zeep.client import Client as ZeepClient, Settings as ZeepSettings
 from zeep.exceptions import Fault
 
-from sympasoap.lists import MailingList, MLUser
-
-TOPICS = [
-    "art",
-    "business",
-    "computers",
-    "education",
-    "entertainment",
-    "government",
-    "health",
-    "news",
-    "recreation",
-    "science",
-    "social",
-    "society",
-]
-
-SUBTOPICS = [
-    "art/finearts",
-    "art/history",
-    "art/literature",
-    "art/photography",
-    "business/b2b",
-    "business/finance",
-    "business/jobs",
-    "business/shopping",
-    "computers/games",
-    "computers/hardware",
-    "computers/internet",
-    "computers/software",
-    "education/college",
-    "education/k12",
-    "entertainment/humour",
-    "entertainment/movies",
-    "entertainment/music",
-    "government/elections",
-    "government/law",
-    "government/military",
-    "government/taxes",
-    "health/diseases",
-    "health/drugs",
-    "health/fitness",
-    "health/medicine",
-    "news/multimedia",
-    "news/newspapers",
-    "news/radio",
-    "news/tv",
-    "recreation/autos",
-    "recreation/outdoors",
-    "recreation/sports",
-    "recreation/travel",
-    "science/animals",
-    "science/astronomy",
-    "science/engineering",
-    "social/archaeology",
-    "social/economics",
-    "social/languages",
-    "society/environment",
-    "society/people",
-    "society/religion",
-]
-
-TEMPLATES = [
-    "confidential",
-    "discussion_list",
-    "hotline",
-    "html-news-letter",
-    "intranet_list",
-    "news-letter",
-    "private_working_group",
-    "public_web_forum",
-]
+from .lists import MailingList, MLUser
+from .constants import SUBTOPICS, TOPICS, TEMPLATES
 
 
 class Client:
