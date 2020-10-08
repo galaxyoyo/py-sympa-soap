@@ -26,10 +26,10 @@ setup(
     package_dir={"": "src"},
     packages=["sympasoap"],
     include_package_data=True,
-    license="MIT",
+    license="GPLv3",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
-        "License :: OSI Approved :: MIT License",
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
