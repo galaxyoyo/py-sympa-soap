@@ -1,3 +1,20 @@
+class MailingList:
+    homepage: str
+    list_address: str
+    subject: str
+
+    def __init__(self, homepage="", list_address="", subject=""):
+        self.homepage = homepage
+        self.list_address = list_address
+        self.subject = subject
+
+    def __str__(self):
+        return f"Mailing-list {self.list_address}"
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+
 class MLUser:
     editor: bool
     email: str

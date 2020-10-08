@@ -1,6 +1,66 @@
 from zeep.client import Client as ZeepClient, Settings as ZeepSettings
 
-from sympasoap.subscribers import MLUser
+from sympasoap.lists import MailingList, MLUser
+
+TOPICS = [
+    "art",
+    "business",
+    "computers",
+    "education",
+    "entertainment",
+    "government",
+    "health",
+    "news",
+    "recreation",
+    "science",
+    "social",
+    "society",
+]
+
+SUBTOPICS = [
+    "art/finearts",
+    "art/history",
+    "art/literature",
+    "art/photography",
+    "business/b2b",
+    "business/finance",
+    "business/jobs",
+    "business/shopping",
+    "computers/games",
+    "computers/hardware",
+    "computers/internet",
+    "computers/software",
+    "education/college",
+    "education/k12",
+    "entertainment/humour",
+    "entertainment/movies",
+    "entertainment/music",
+    "government/elections",
+    "government/law",
+    "government/military",
+    "government/taxes",
+    "health/diseases",
+    "health/drugs",
+    "health/fitness",
+    "health/medicine",
+    "news/multimedia",
+    "news/newspapers",
+    "news/radio",
+    "news/tv",
+    "recreation/autos",
+    "recreation/outdoors",
+    "recreation/sports",
+    "recreation/travel",
+    "science/animals",
+    "science/astronomy",
+    "science/engineering",
+    "social/archaeology",
+    "social/economics",
+    "social/languages",
+    "society/environment",
+    "society/people",
+    "society/religion",
+]
 
 
 class Client:
@@ -70,3 +130,48 @@ class Client:
                 users.append(user)
             return users
         return self.zeep.service.review(mailing_list)
+
+    def lists(self, topic: str, subtopic: str) -> list:
+        """
+        Get all the (visible) lists that match the given topic and the given subtopic.
+        See TOPICS and SUBTOPICS for valid topics and subtopics.
+        """
+        if topic not in TOPICS:
+            raise ValueError(f"'{topic}' is not a valid topic.")
+        if subtopic and f"{topic}/{subtopic}" not in SUBTOPICS:
+            raise ValueError(f"'{topic}/{subtopic}' is not a valid subtopic.")
+        result = self.zeep.service.lists(topic, subtopic)._value_1
+        if result is None:
+            return list()
+        lists = list()
+        for list_info in result:
+            split = list_info.split(';')
+            kwargs = dict()
+            for data in split:
+                key, value = data.split("=", 2)
+                if key == "listAddress":
+                    key = "list_address"
+                kwargs[key] = value
+            ml = MailingList(**kwargs)
+            lists.append(ml)
+        return lists
+
+    def all_lists(self, subtopics: list = None):
+        """
+        Retrieve all lists that matches at least one subtopic in a given list.
+        If the list is None, retrieve all existing lists.
+        Warning: takes time because it is retriving the list for each topic.
+        """
+        if subtopics is None:
+            subtopics = TOPICS + SUBTOPICS
+
+        lists = list()
+
+        for subtopic in list(subtopics):
+            if "/" in subtopic:
+                li = self.lists(subtopic.split("/")[0], subtopic.split("/")[1])
+            else:
+                li = self.lists(subtopic.split("/")[0], "")
+            lists.extend(li)
+
+        return lists
