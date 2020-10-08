@@ -1,4 +1,5 @@
 from zeep.client import Client as ZeepClient, Settings as ZeepSettings
+from zeep.exceptions import Fault
 
 from sympasoap.lists import MailingList, MLUser
 
@@ -60,6 +61,17 @@ SUBTOPICS = [
     "society/environment",
     "society/people",
     "society/religion",
+]
+
+TEMPLATES = [
+    "confidential",
+    "discussion_list",
+    "hotline",
+    "html-news-letter",
+    "intranet_list",
+    "news-letter",
+    "private_working_group",
+    "public_web_forum",
 ]
 
 
@@ -187,3 +199,15 @@ class Client:
             ml = MailingList(**kwargs)
             lists.append(ml)
         return lists
+
+    def create_list(self, list_name: str, subject: str, template: str, description: str, topic: str,
+                    use_custom_template: bool = False) -> bool:
+        if topic not in TOPICS and topic not in SUBTOPICS:
+            raise ValueError(f"Topic '{topic}' does not exist.")
+        if template not in TEMPLATES and not use_custom_template:
+            raise ValueError(f"Template '{template}' does not exist.")
+        try:
+            result = self.zeep.service.createList(list_name, subject, template, description, topic)
+            return result._raw_elements[0].text == "true"
+        except Fault:
+            raise Fault(f"An unknown error occured while creating the list {list_name}. Maybe the list already exists?")
