@@ -18,7 +18,7 @@ setup(
     url="https://gitlab.com/animath/si/py-sympa-soap",
     python_requires=">=3.6",
     install_requires=[
-        "zeep~=1.4.0",
+        "zeep~=3.4.0",
     ],
     tests_require=[],
     extras_require={},
