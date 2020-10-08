@@ -131,7 +131,10 @@ class Client:
         return lists
 
     def create_list(self, list_name: str, subject: str, template: str, description: str, topic: str,
-                    use_custom_template: bool = False) -> bool:
+                    use_custom_template: bool = False, raise_error: bool = True) -> bool:
+        """
+        Create a new mailing-list.
+        """
         if topic not in TOPICS and topic not in SUBTOPICS:
             raise ValueError(f"Topic '{topic}' does not exist.")
         if template not in TEMPLATES and not use_custom_template:
@@ -139,5 +142,26 @@ class Client:
         try:
             result = self.zeep.service.createList(list_name, subject, template, description, topic)
             return result._raw_elements[0].text == "true"
-        except Fault:
-            raise Fault(f"An unknown error occured while creating the list {list_name}. Maybe the list already exists?")
+        except Fault as e:
+            if raise_error:
+                raise Fault(f"An unknown error occured while creating the list {list_name}. "
+                            f"Maybe the list already exists?", e)
+            else:
+                return False
+
+    def delete_list(self, list_name: str, raise_error: bool = False) -> bool:
+        """
+        Close a mailing list.
+        Warning: the list is not deleted in order to keep the history. Please use the web interface to fully
+        delete the list.
+        Well, the main reason is that the API does not provide a delete method.
+        """
+        try:
+            result = self.zeep.service.closeList(list_name)
+            return result._raw_elements[0].text == "true"
+        except Fault as e:
+            if raise_error:
+                raise Fault(f"An unknown error occured while deleting the list {list_name}. "
+                            f"Maybe the list did not exist?", e)
+            else:
+                return False
