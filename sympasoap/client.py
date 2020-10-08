@@ -76,12 +76,12 @@ class Client:
         element = result._raw_elements[0]
         self.cookie = element.text
         self.zeep.settings.extra_http_headers = [("Cookie", f"sympa_session={element.text}")]
-        if self.checkCookie() != email:
+        if self.check_cookie() != email:
             # FIXME Better exception
             raise Exception("Unknown error: given cookie is invalid")
         print("Successfully authenticated!")
 
-    def checkCookie(self) -> str:
+    def check_cookie(self) -> str:
         """
         From the current cookie, retrieve the email address.
         """
@@ -89,7 +89,7 @@ class Client:
         element = result._raw_elements[0]
         return element.text
 
-    def amI(self, mailing_list: str, function: str, email: str) -> bool:
+    def is_subscriber(self, email: str, mailing_list: str, function: str = "subscriber") -> bool:
         """
         Check if the given `email` is a member of type `function` in the `mailing_list`.
         The function parameter is one between subscriber, editor or owner.
@@ -100,13 +100,13 @@ class Client:
         element = result._raw_elements[0]
         return element.text == "true"
 
-    def review(self, mailing_list: str, full: bool = False) -> list:
+    def get_subscribers(self, mailing_list: str, emails_only: bool = True) -> list:
         """
         Get the list of all subscribers of a list, including the administrators and the editors.
-        If full=False, retrieve the list of email addresses only.
-        If full=True, retrieve MLUser object, with the name of the user and the role.
+        If emails_only == True, retrieve the list of email addresses only.
+        Else, retrieve MLUser object, with the name of the user and the role.
         """
-        if full:
+        if not emails_only:
             users = list()
             elements = self.zeep.service.fullReview(mailing_list)
             for element in elements:
@@ -156,22 +156,24 @@ class Client:
             lists.append(ml)
         return lists
 
-    def all_lists(self, subtopics: list = None):
+    def all_lists(self) -> list:
         """
-        Retrieve all lists that matches at least one subtopic in a given list.
-        If the list is None, retrieve all existing lists.
-        Warning: takes time because it is retriving the list for each topic.
+        Retrieve all lists.
         """
-        if subtopics is None:
-            subtopics = TOPICS + SUBTOPICS
-
+        elem = self.zeep.service.complexLists()._raw_elements[0]
         lists = list()
-
-        for subtopic in list(subtopics):
-            if "/" in subtopic:
-                li = self.lists(subtopic.split("/")[0], subtopic.split("/")[1])
-            else:
-                li = self.lists(subtopic.split("/")[0], "")
-            lists.extend(li)
-
+        for list_info in elem.getchildren():
+            kwargs = dict()
+            for child in list_info.getchildren():
+                if "listAddress" in child.tag:
+                    key = "list_address"
+                elif "subject" in child.tag:
+                    key = "subject"
+                elif "homepage" in child.tag:
+                    key = "homepage"
+                else:
+                    raise ValueError(f"Tag {child.tag} is unknown")
+                kwargs[key] = child.text
+            ml = MailingList(**kwargs)
+            lists.append(ml)
         return lists
